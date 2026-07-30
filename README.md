@@ -9,7 +9,7 @@ The implementation uses a circular array to eliminate unnecessary element shifti
 The repository is organized as follows:
 
 - README.md - Explains the implementation, complexity analysis, and usage.
-- array_queue.py - Contains the complete queue implementation.
+- ArrayQueue.py - Contains the complete queue implementation.
 - test_array_queue.py - Provides sample tests to validate the queue's behavior.
 
 ---
@@ -77,10 +77,10 @@ As a result, although an occasional insertion is expensive, the average cost ove
 
 A typical dequeue operation performs only four constant-time steps:
 
-Retrieve the front element.
-Replace the removed position with None.
-Advance the front index.
-Decrease the queue size.
+1. Retrieve the front element.
+2. Replace the removed position with None.
+3. Advance the front index.
+4. Decrease the queue size.
 
 These operations are all O(1).
 
