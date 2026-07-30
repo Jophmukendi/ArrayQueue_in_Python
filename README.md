@@ -8,6 +8,49 @@ The implementation uses a circular array to eliminate unnecessary element shifti
 
 The repository is organized as follows:
 
--- README.md explains the implementation, complexity analysis, and usage.
--- array_queue.py contains the complete queue implementation.
--- test_array_queue.py provides sample tests to validate the queue's behavior.
+- README.md - Explains the implementation, complexity analysis, and usage.
+- array_queue.py - Contains the complete queue implementation.
+- test_array_queue.py - Provides sample tests to validate the queue's behavior.
+
+---
+## Objectives
+
+This project demonstrates the following computer science concepts:
+
+- Queue Abstract Data Type (ADT)
+- First-In, First-Out (FIFO) processing
+- Constant-time front access
+- Efficient enqueue and dequeue operations
+- Circular array implementation for efficient indexing
+- Dynamic array resizing
+- Object-oriented programming in Python
+- Exception handling
+- Memory-efficient data structures
+- Time complexity analysis
+- Amortized analysis
+
+The primary goal is to understand how a queue works internally instead of relying on Python's built-in implementations.
+
+---
+## Implementation Overview
+
+The queue stores its elements inside a Python list that acts as a dynamic array.
+
+Instead of shifting every element after a dequeue operation, the implementation maintains a front index (_f) that always points to the first element in the queue.
+
+When an element is removed, the front index simply advances using modular arithmetic:
+
+```python
+self._f = (self._f + 1) % len(self._data)
+```
+
+This creates a circular array, allowing empty positions at the beginning of the array to be reused efficiently.
+
+Whenever the array becomes full, its capacity is doubled.
+
+Whenever the number of stored elements falls below one-quarter of the current capacity, the array shrinks to half its size.
+
+This strategy minimizes both memory usage and the number of expensive resizing operations.
+
+---
+## Time Complexity
