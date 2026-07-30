@@ -54,3 +54,12 @@ This strategy minimizes both memory usage and the number of expensive resizing o
 
 ---
 ## Time Complexity
+
+|Operation| Complexity|
+---------------------
+|enqueue()|	O(1) amortized\
+|dequeue()|	O(1) amortized|
+|first()|	O(1)| is_empty()	O(1)|
+|len(queue)|	O(1)|
+
+Hello
