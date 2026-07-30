@@ -55,11 +55,70 @@ This strategy minimizes both memory usage and the number of expensive resizing o
 ---
 ## Time Complexity
 
-|Operation| Complexity|
----------------------
-|enqueue()|	O(1) amortized\
-|dequeue()|	O(1) amortized|
-|first()|	O(1)| is_empty()	O(1)|
-|len(queue)|	O(1)|
+| Operation | Complexity |
+|-----------|------------|
+| enqueue() |	O(1) amortized |
+| dequeue() |	O(1) amortized |
+| first() |	O(1) | 
+| is_empty() | O(1) |
+| len(queue)|	O(1)|
 
-Hello
+## Why Enqueue is O(1) Amortized
+
+Most enqueue operations simply place a new element into the next available position in the array.
+
+Only when the array becomes completely full does the implementation allocate a larger array and copy the existing elements into it. This resizing operation requires O(n) time.
+
+However, because the array capacity doubles after each resize, many future enqueue operations occur before another resize is necessary.
+
+As a result, although an occasional insertion is expensive, the average cost over a sequence of enqueue operations remains O(1).
+
+## Why Dequeue is O(1) Amortized
+
+A typical dequeue operation performs only four constant-time steps:
+
+Retrieve the front element.
+Replace the removed position with None.
+Advance the front index.
+Decrease the queue size.
+
+These operations are all O(1).
+
+Occasionally, after many dequeue operations, the queue occupies only a small portion of the allocated array. When the number of elements becomes less than one-quarter of the current capacity, the implementation allocates a smaller array and copies the remaining elements.
+
+Although this resizing operation requires O(n) time, it occurs only after many dequeue operations.
+
+Therefore, the average running time of dequeue remains O(1) when analyzed over a long sequence of operations.
+
+## What Does "Amortized" Mean?
+
+Amortized analysis measures the average cost of an operation across a long sequence of operations instead of focusing on the occasional expensive operation.
+
+Although one enqueue operation temporarily costs O(n) because every element must be copied into a larger array, that expensive operation is spread across many future enqueue operations.
+
+The same principle applies to dequeue(). Shrinking the array occasionally requires copying elements, but because shrinking occurs only after many removals, the average cost of each dequeue operation remains O(1).
+
+This is why both enqueue and dequeue are said to run in O(1) amortized time rather than strict O(1) worst-case time.
+
+## Space Complexity
+
+| Resource | Complexity |
+|----------|------------|
+| Queue Storage |	O(n) |
+
+The queue stores only the elements currently contained in the data structure, along with a small amount of additional capacity reserved for future growth.
+
+## Design Decisions
+
+Several implementation choices improve both performance and maintainability:
+
+- Circular indexing avoids shifting elements after every dequeue.
+- Dynamic expansion doubles the capacity when the queue becomes full.
+- Dynamic shrinking reduces unused memory when the queue becomes sparse.
+- Removed elements are set to None to allow Python's garbage collector to reclaim memory.
+- During resizing, elements are copied into contiguous positions and the front index is reset to zero while preserving FIFO order.
+
+# Conclusion
+
+The ArrayQueue implementation provides an efficient, memory-conscious, and educational example of a queue built from first principles. By combining a circular array with dynamic resizing, it achieves O(1) amortized time for both enqueue and dequeue operations while maintaining O(n) space complexity.
+
