@@ -1,4 +1,4 @@
-# Array Queue In Python
+# Array Queue in Python
 
 ## Overview
 
