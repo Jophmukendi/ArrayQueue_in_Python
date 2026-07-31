@@ -2,123 +2,126 @@
 
 ## Overview
 
-This project implements a First-In, First-Out (FIFO) Queue using a dynamically resizable array in Python. Rather than relying on Python's built-in collections.deque, the queue is implemented entirely from scratch to demonstrate the internal mechanics of one of the most fundamental data structures in computer science.
+An **Array Queue** is a queue data structure that stores elements in an array (or list) and follows the **First-In, First-Out (FIFO)** principle. This means the first element added to the queue is the first one removed.
 
-The implementation uses a circular array to eliminate unnecessary element shifting and supports automatic dynamic resizing to maintain both performance and memory efficiency.
+Python already provides queue implementations, such as `collections.deque`, which are optimized for real-world applications. In this project, however, the queue is implemented **from scratch** to demonstrate how a queue works internally instead of relying on Python's built-in data structures.
+
+This implementation uses a **circular array**, meaning that when the end of the array is reached, the queue wraps around and reuses the empty positions at the beginning. This eliminates unnecessary element shifting and improves performance. The array also grows automatically when it becomes full and shrinks when it becomes mostly empty to use memory efficiently.
+
+Array queues are commonly used in many software systems, including:
+
+* **Print servers** to process print jobs in order.
+* **Web servers** to handle incoming client requests.
+* **Customer support systems** to manage support tickets.
+* **Task schedulers** to execute background jobs.
+* **Message queue systems** such as RabbitMQ, Apache Kafka, and Amazon SQS for communication between services.
 
 The repository is organized as follows:
 
-- README.md - Explains the implementation, complexity analysis, and usage.
-- ArrayQueue.py - Contains the complete queue implementation.
-- test_array_queue.py - Provides sample tests to validate the queue's behavior.
+* **README.md** – Project documentation, implementation details, and complexity analysis.
+* **ArrayQueue.py** – Complete implementation of the Array Queue.
+* **test_array_queue.py** – Sample test cases for validating the queue operations.
 
 ---
+
 ## Objectives
 
-This project demonstrates the following computer science concepts:
+The goal of this project is to understand how an **Array Queue** works by implementing it from scratch in Python. Instead of using Python's built-in queue classes, this implementation focuses on the core concepts behind the data structure.
 
-- Queue Abstract Data Type (ADT)
-- First-In, First-Out (FIFO) processing
-- Constant-time front access
-- Efficient enqueue and dequeue operations
-- Circular array implementation for efficient indexing
-- Dynamic array resizing
-- Object-oriented programming in Python
-- Exception handling
-- Memory-efficient data structures
-- Time complexity analysis
-- Amortized analysis
+By completing this project, you will learn:
 
-The primary goal is to understand how a queue works internally instead of relying on Python's built-in implementations.
+* How a FIFO (First-In, First-Out) queue works.
+* How a circular array improves performance.
+* How dynamic resizing manages memory efficiently.
+* Why enqueue and dequeue operations run in **O(1) amortized** time.
+* How object-oriented programming can be used to build data structures.
 
 ---
+
 ## Implementation Overview
 
 The queue stores its elements inside a Python list that acts as a dynamic array.
 
-Instead of shifting every element after a dequeue operation, the implementation maintains a front index (_f) that always points to the first element in the queue.
-
-When an element is removed, the front index simply advances using modular arithmetic:
+A variable named `_f` keeps track of the front of the queue. Instead of moving every element after a `dequeue()`, the front index simply moves to the next position.
 
 ```python
 self._f = (self._f + 1) % len(self._data)
 ```
 
-This creates a circular array, allowing empty positions at the beginning of the array to be reused efficiently.
+The modulo operator (`%`) allows the index to wrap around to the beginning of the array when it reaches the end. This creates a **circular array**, which avoids unnecessary element shifting.
 
-Whenever the array becomes full, its capacity is doubled.
+The queue also resizes itself automatically:
 
-Whenever the number of stored elements falls below one-quarter of the current capacity, the array shrinks to half its size.
+* The array **doubles** when it becomes full.
+* The array **shrinks to half** when it is less than one-quarter full.
 
-This strategy minimizes both memory usage and the number of expensive resizing operations.
+This approach provides good performance while using memory efficiently.
 
 ---
+
 ## Time Complexity
 
-| Operation | Complexity |
-|-----------|------------|
-| enqueue() |	O(1) amortized |
-| dequeue() |	O(1) amortized |
-| first() |	O(1) | 
-| is_empty() | O(1) |
-| len(queue)|	O(1)|
+| Operation    | Complexity         |
+| ------------ | ------------------ |
+| `enqueue()`  | **O(1) amortized** |
+| `dequeue()`  | **O(1) amortized** |
+| `first()`    | **O(1)**           |
+| `is_empty()` | **O(1)**           |
+| `len(queue)` | **O(1)**           |
 
-## Why Enqueue is O(1) Amortized
+---
 
-Most enqueue operations simply place a new element into the next available position in the array.
+## Why Are `enqueue()` and `dequeue()` O(1) Amortized?
 
-Only when the array becomes completely full does the implementation allocate a larger array and copy the existing elements into it. This resizing operation requires O(n) time.
+Most `enqueue()` operations simply insert a new element into the next available position. Likewise, most `dequeue()` operations remove the front element and move the front index to the next position. These operations take constant time.
 
-However, because the array capacity doubles after each resize, many future enqueue operations occur before another resize is necessary.
+Sometimes, however, the queue must resize its underlying array:
 
-As a result, although an occasional insertion is expensive, the average cost over a sequence of enqueue operations remains O(1).
+* When the array becomes full, a larger array is created and all elements are copied into it.
+* When the queue becomes mostly empty, a smaller array is created and the remaining elements are copied.
 
-## Why Dequeue is O(1) Amortized
+These resize operations take **O(n)** time because every element must be copied.
 
-A typical dequeue operation performs only four constant-time steps:
+Fortunately, resizing happens only occasionally. Between two resize operations, many enqueue and dequeue operations run in constant time. When the total cost is averaged over all operations, both **enqueue()** and **dequeue()** have an **O(1) amortized** running time.
 
-1. Retrieve the front element.
-2. Replace the removed position with None.
-3. Advance the front index.
-4. Decrease the queue size.
-
-These operations are all O(1).
-
-Occasionally, after many dequeue operations, the queue occupies only a small portion of the allocated array. When the number of elements becomes less than one-quarter of the current capacity, the implementation allocates a smaller array and copies the remaining elements.
-
-Although this resizing operation requires O(n) time, it occurs only after many dequeue operations.
-
-Therefore, the average running time of dequeue remains O(1) when analyzed over a long sequence of operations.
+---
 
 ## What Does "Amortized" Mean?
 
-Amortized analysis measures the average cost of an operation across a long sequence of operations instead of focusing on the occasional expensive operation.
+**Amortized analysis** measures the average cost of an operation over a long sequence of operations.
 
-Although one enqueue operation temporarily costs O(n) because every element must be copied into a larger array, that expensive operation is spread across many future enqueue operations.
+For example, one `enqueue()` may take **O(n)** when the array grows, but hundreds of other enqueue operations will take only **O(1)** before another resize is needed.
 
-The same principle applies to dequeue(). Shrinking the array occasionally requires copying elements, but because shrinking occurs only after many removals, the average cost of each dequeue operation remains O(1).
+The same idea applies to `dequeue()`. Shrinking the array requires copying elements, but it happens only after many removals.
 
-This is why both enqueue and dequeue are said to run in O(1) amortized time rather than strict O(1) worst-case time.
+For this reason, the average running time of both operations is **O(1) amortized**, even though a few individual operations may temporarily take **O(n)**.
+
+---
 
 ## Space Complexity
 
-| Resource | Complexity |
-|----------|------------|
-| Queue Storage |	O(n) |
+| Resource      | Complexity |
+| ------------- | ---------- |
+| Queue Storage | **O(n)**   |
 
-The queue stores only the elements currently contained in the data structure, along with a small amount of additional capacity reserved for future growth.
+The queue stores only the current elements and a small amount of extra space for future growth.
+
+---
 
 ## Design Decisions
 
-Several implementation choices improve both performance and maintainability:
+This implementation includes several design choices to improve performance and memory usage:
 
-- Circular indexing avoids shifting elements after every dequeue.
-- Dynamic expansion doubles the capacity when the queue becomes full.
-- Dynamic shrinking reduces unused memory when the queue becomes sparse.
-- Removed elements are set to None to allow Python's garbage collector to reclaim memory.
-- During resizing, elements are copied into contiguous positions and the front index is reset to zero while preserving FIFO order.
+* A **circular array** avoids shifting elements after each dequeue.
+* **Dynamic expansion** doubles the array size when it becomes full.
+* **Dynamic shrinking** reduces memory usage when the queue becomes mostly empty.
+* Removed elements are replaced with `None` so Python can reclaim unused memory.
+* During resizing, the queue is copied into a new array while preserving the correct FIFO order.
 
-# Conclusion
+---
 
-The ArrayQueue implementation provides an efficient, memory-conscious, and educational example of a queue built from first principles. By combining a circular array with dynamic resizing, it achieves O(1) amortized time for both enqueue and dequeue operations while maintaining O(n) space complexity.
+## Conclusion
 
+This project demonstrates how to build an **Array Queue** from scratch using a circular array and dynamic resizing. These techniques provide efficient memory usage and allow both `enqueue()` and `dequeue()` to run in **O(1) amortized** time while maintaining an overall space complexity of **O(n)**.
+
+Although Python provides built-in queue implementations, understanding how they work internally is an important step toward mastering data structures and algorithm design.
